@@ -56,6 +56,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
     dropBox.ondragenter = ignoreDrag;
     dropBox.ondragover = ignoreDrag;
     dropBox.ondrop = drop;
+
+    document.getElementById("panel-curr").style.display = "none";
+    document.getElementById("panel-file").style.display = "none";
 });
 // API Call Handler
 function callAPI(mode) {
@@ -67,10 +70,12 @@ function callAPI(mode) {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             if (mode == "curr") {
                 jsonCurr = JSON.parse(xmlhttp.responseText);
+                document.getElementById("panel-curr").style.display = "contents";
                 // console.log(jsonCurr);
             }
             if (mode == "file") {
                 jsonFile = JSON.parse(xmlhttp.responseText);
+                document.getElementById("panel-file").style.display = "contents";
                 // console.log(jsonFile);
             }
             haversineFormula();

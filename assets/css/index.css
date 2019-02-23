@@ -73,6 +73,9 @@ html, body, main {
     height: 500px;
     width: 95%;
 }
+    .tooltip {
+        font-size: 30px;
+    }
 
 .panel-container-main {
     width: 100%;
@@ -80,25 +83,25 @@ html, body, main {
     flex-flow: row wrap;
     justify-content: center; /* centers all content (widgets) */
 }
-/* Location Panels */
-.panel-container {
-    margin: 5px;
-}
-.panel {
-    align-items: center; /* Vertical center alignment */
-    background-color: white;
-    border-radius: 4px;
-    border: 1px solid #cdcecf;
-    box-shadow: 1px 1px 50px 1px #e7e7e7;
-    display: flex;
-    font-size: 20px;
-    justify-content: center; /* Horizontal center alignment */
-    margin: 0;
-    overflow: hidden;
-    padding: 20px 10px;
-    transition: all 200ms;
-    word-wrap: break-word;
-}
+    /* Location Panels */
+    .panel-container {
+        margin: 5px;
+    }
+    .panel {
+        align-items: center; /* Vertical center alignment */
+        background-color: white;
+        border-radius: 4px;
+        border: 1px solid #cdcecf;
+        box-shadow: 1px 1px 50px 1px #e7e7e7;
+        display: flex;
+        font-size: 20px;
+        justify-content: center; /* Horizontal center alignment */
+        margin: 0;
+        overflow: hidden;
+        padding: 20px 10px;
+        transition: all 200ms;
+        word-wrap: break-word;
+    }
     .panel:hover {
         transform: scale(1.05);
     }
@@ -142,10 +145,6 @@ html, body, main {
         background-color: #F44336;
     }
 
-.tooltip {
-    font-size: 30px;
-}
-
 /* Footer */
 .footer {
     background: white;
@@ -166,7 +165,7 @@ html, body, main {
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media (max-width: 600px) {
     .container-main {
-        width: 95%;
+        width: 90%;
     }
     .panel-container {
         width: 100%;
@@ -175,7 +174,7 @@ html, body, main {
     /* Small devices (portrait tablets and large phones, 600px and up) */
     @media (min-width: 600px) {
         .container-main {
-            width: 95%;
+            width: 90%;
         }
         .panel-container {
             width: 100%;
