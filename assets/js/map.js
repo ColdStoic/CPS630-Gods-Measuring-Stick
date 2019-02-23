@@ -4,7 +4,7 @@ var jsonFile = null;
 var positionCurr = new Array(2);
 var positionFile = null;
 var posOptions = {enableHighAccuracy: false, timeout: 5000, maximumAge: 0};
-var latlngs = null;
+var latlngs = [[0, 0], [0, 0]];
 var distance = 0;
 
 // API token goes here
@@ -25,10 +25,7 @@ var map = L.map('map', {
 var markerCurr = L.marker([0, 0]).addTo(map);
 var markerFile = L.marker([0, 0]).addTo(map);
 
-var latlngs = [
-    [0, 0],
-    [0, 0]
-];
+// Path Polyline
 var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
 
 // Add the 'scale' control
@@ -37,12 +34,12 @@ L.control.scale().addTo(map);
 // Add the 'layers' control
 L.control.layers({"Streets": streets}).addTo(map);
 
+// Map On-Click Handler
 function onMapClick(e) {
     positionCurr[0] = e.latlng.lat;
     positionCurr[1] = e.latlng.lng;
     callAPI("curr");
 }
-
 map.on('click', onMapClick);
 
 // Onload
@@ -51,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         navigator.geolocation.getCurrentPosition(geolocationSuccess, geolocationFailure, posOptions);
     }
     else {
-        //results.innerHTML = "This browser doesn't support geolocation.";
+        alert("This browser doesn't support geolocation.");
     }
 
     // Drag and Drop Box
@@ -60,6 +57,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     dropBox.ondragover = ignoreDrag;
     dropBox.ondrop = drop;
 });
+// API Call Handler
 function callAPI(mode) {
     var xmlhttp = new XMLHttpRequest();
     var jsonURL = "";
@@ -88,7 +86,6 @@ function callAPI(mode) {
     if (mode == "file") {
         jsonURL = "https://us1.locationiq.com/v1/reverse.php?key=" + key + "&lat=" + positionFile[0] + "&lon=" + positionFile[1] + "&format=json";
     }
-    console.log(jsonURL);
     xmlhttp.open("GET", jsonURL, true);
     xmlhttp.send();
 }
@@ -115,6 +112,7 @@ function handleFiles(files) {
     reader.readAsText(file);
 }
 
+// GeoLocation Handlers
 function geolocationSuccess(position) {
     positionCurr[0] = position.coords.latitude;
     positionCurr[1] = position.coords.longitude;
@@ -126,6 +124,7 @@ function geolocationFailure(error) {
     console.log("FAILED");
 }
 
+// Set Map
 function setMap() {
     // Moves marker.
     markerCurr.setLatLng([positionCurr[0], positionCurr[1]]);
@@ -178,7 +177,7 @@ function haversineFormula() {
         distance = event.data;
         polyline.unbindTooltip();
         polyline.setLatLngs(latlngs);
-        polyline.bindTooltip(distance + "km", {permanent: true, direction:"center", className: "tooltip"});
+        polyline.bindTooltip((Math.round(distance * 10) / 10 ) + "km", {permanent: true, direction:"center", className: "tooltip"});
     }
 
     // Create a new worker.
