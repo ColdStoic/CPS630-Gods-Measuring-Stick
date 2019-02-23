@@ -1,5 +1,6 @@
 
-function haversineFormula(e) {
+// This formula was found on StackOverflow..
+function haversine_formula(e) {
     function toRad(x) {
         return x * Math.PI / 180;
     }
@@ -25,4 +26,6 @@ function haversineFormula(e) {
     self.postMessage(d);
 }
 
-self.addEventListener('message', haversineFormula);
+// Workaround to allow local workers on Google Chrome.
+if (window != self) haversine_formula(e);
+// self.addEventListener('message', haversineFormula);

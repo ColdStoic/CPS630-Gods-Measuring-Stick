@@ -3,10 +3,11 @@ var jsonCurr = null;
 var jsonFile = null;
 var positionCurr = new Array(2);
 var positionFile = null;
-var posOptions = {enableHighAccuracy: false, timeout: 5000, maximumAge: 0};
+var posOptions = { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 };
 var latlngs = [[0, 0], [0, 0]];
 var distance = 0;
 
+// Map
 // API token goes here
 var key = '0f5ed629c92c2c';
 
@@ -121,12 +122,13 @@ function handleFiles(files) {
 function geolocationSuccess(position) {
     positionCurr[0] = position.coords.latitude;
     positionCurr[1] = position.coords.longitude;
+
     // Moves map.
     map.setView([positionCurr[0], positionCurr[1]], 13);
     callAPI("curr");
 }
 function geolocationFailure(error) {
-    console.log("FAILED");
+    console.log("This browser doesn't support geolocation.");
 }
 
 // Set Map
@@ -175,23 +177,29 @@ function setLocationPanels() {
 function haversineFormula() {
     if(positionFile != null) {
         function handleWorkerError(event) {
-        console.warn('Error in web worker: ', event.message);
-    }
-    function handleWorkerMessage(event) {
-        console.log('Distance: ' + event.data);
-        distance = event.data;
-        polyline.unbindTooltip();
-        polyline.setLatLngs(latlngs);
-        polyline.bindTooltip((Math.round(distance * 10) / 10 ) + "km", {permanent: true, direction:"center", className: "tooltip"});
-    }
+            console.warn('Error in web worker: ', event.message);
+        }
+        function handleWorkerMessage(event) {
+            console.log('Distance: ' + event.data);
+            distance = event.data;
+            polyline.unbindTooltip();
+            polyline.setLatLngs(latlngs);
+            polyline.bindTooltip((Math.round(distance * 10) / 10 ) + "km", {permanent: true, direction:"center", className: "tooltip"});
 
-    // Create a new worker.
-    var myNewWorker = new Worker('assets/js/wworker.js');
+            myNewWorker.terminate(); // Kill worker when calculation is complete.
+        }
 
-    // Register error and message event handlers on the worker.
-    myNewWorker.addEventListener('error', handleWorkerError);
-    myNewWorker.addEventListener('message', handleWorkerMessage);
+        // Create a new worker.
+        // Workaround to allow local workers on Google Chrome.
+        var blob = new Blob(["onmessage = function(e){" + haversine_formula.toString() + "haversine_formula(e);}"]);
+        var blobURL = window.URL.createObjectURL(blob);
+        var myNewWorker = new Worker(blobURL);
+        // var myNewWorker = new Worker('assets/js/wworker.js');
 
-    myNewWorker.postMessage([positionCurr[0], positionCurr[1], positionFile[0], positionFile[1]]);
+        // Register error and message event handlers on the worker.
+        myNewWorker.addEventListener('error', handleWorkerError);
+        myNewWorker.addEventListener('message', handleWorkerMessage);
+
+        myNewWorker.postMessage([positionCurr[0], positionCurr[1], positionFile[0], positionFile[1]]);
     }
 }
