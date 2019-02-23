@@ -142,6 +142,10 @@ html, body, main {
         background-color: #F44336;
     }
 
+.tooltip {
+    font-size: 30px;
+}
+
 /* Footer */
 .footer {
     background: white;

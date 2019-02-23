@@ -4,6 +4,8 @@ var jsonFile = null;
 var positionCurr = new Array(2);
 var positionFile = null;
 var posOptions = {enableHighAccuracy: false, timeout: 5000, maximumAge: 0};
+var latlngs = null;
+var distance = 0;
 
 // API token goes here
 var key = '0f5ed629c92c2c';
@@ -20,8 +22,14 @@ var map = L.map('map', {
 });
 
 // Marker
-var markerCurr = L.marker([39.73, -104.99]).addTo(map);
-var markerFile = L.marker([39.73, -104.99]).addTo(map);
+var markerCurr = L.marker([0, 0]).addTo(map);
+var markerFile = L.marker([0, 0]).addTo(map);
+
+var latlngs = [
+    [0, 0],
+    [0, 0]
+];
+var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
 
 // Add the 'scale' control
 L.control.scale().addTo(map);
@@ -32,10 +40,7 @@ L.control.layers({"Streets": streets}).addTo(map);
 function onMapClick(e) {
     positionCurr[0] = e.latlng.lat;
     positionCurr[1] = e.latlng.lng;
-
     callAPI("curr");
-    setMap();
-    haversineFormula();
 }
 
 map.on('click', onMapClick);
@@ -64,14 +69,15 @@ function callAPI(mode) {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             if (mode == "curr") {
                 jsonCurr = JSON.parse(xmlhttp.responseText);
-                setLocationPanels();
-                console.log(jsonCurr);
+                // console.log(jsonCurr);
             }
             if (mode == "file") {
                 jsonFile = JSON.parse(xmlhttp.responseText);
-                setLocationPanels();
-                console.log(jsonFile);
+                // console.log(jsonFile);
             }
+            haversineFormula();
+            setLocationPanels();
+            setMap();
         }
     }
 
@@ -105,9 +111,6 @@ function handleFiles(files) {
     reader.onload = function (e) {
         positionFile = e.target.result.split(", ");
         callAPI("file");
-        setMap();
-        haversineFormula();
-        console.log(positionFile[0] + ", " + positionFile[1]);
     };
     reader.readAsText(file);
 }
@@ -115,25 +118,25 @@ function handleFiles(files) {
 function geolocationSuccess(position) {
     positionCurr[0] = position.coords.latitude;
     positionCurr[1] = position.coords.longitude;
+    // Moves map.
+    map.setView([positionCurr[0], positionCurr[1]], 13);
     callAPI("curr");
-    setMap();
 }
 function geolocationFailure(error) {
     console.log("FAILED");
 }
 
 function setMap() {
-    // Moves map.
-    map.setView([positionCurr[0], positionCurr[1]], 13);
     // Moves marker.
     markerCurr.setLatLng([positionCurr[0], positionCurr[1]]);
 
     if (positionFile != null) {
-        markerFile.setLatLng([positionFile[0], positionFile[1]]);
-        map.fitBounds([
+        latlngs = [
             [positionCurr[0], positionCurr[1]],
             [positionFile[0], positionFile[1]]
-        ]);
+        ];
+        markerFile.setLatLng([positionFile[0], positionFile[1]]);
+        map.fitBounds(latlngs);
     }
 }
 
@@ -171,7 +174,11 @@ function haversineFormula() {
         console.warn('Error in web worker: ', event.message);
     }
     function handleWorkerMessage(event) {
-        console.log('Message received from worker: ' + event.data);
+        console.log('Distance: ' + event.data);
+        distance = event.data;
+        polyline.unbindTooltip();
+        polyline.setLatLngs(latlngs);
+        polyline.bindTooltip(distance + "km", {permanent: true, direction:"center", className: "tooltip"});
     }
 
     // Create a new worker.
