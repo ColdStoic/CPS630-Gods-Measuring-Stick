@@ -36,37 +36,37 @@ html, body, main {
 
 /* Main Map Container */
 .container-main {
-    height: 100%;
     background-color: white;
     border: 1px solid #cdcecf;
     box-shadow: 1px 1px 50px 1px #e7e7e7;
     display: flex;
     flex-flow: row wrap;
+    height: 100%;
     justify-content: center; /* centers all content (widgets) */
 }
 
 .drop-box-container {
-    width: 100%;
     display: flex;
     justify-content: center;
+    width: 100%;
 }
     #drop-box {
-        border: 5px solid black;
+        align-items: center;
         border-radius: 5px;
         border-style: dashed;
+        border: 5px solid black;
         box-shadow: 1px 1px 50px 1px #e7e7e7;
-        width: 200px;
-        height: 200px;
         display: flex;
-        align-items: center;
+        height: 200px;
         justify-content: center;
         text-align: center;
+        width: 200px;
     }
     #file-input {
-        width: 100%;
-        text-align: center;
-        position: relative;
         left: 15px;
+        position: relative;
+        text-align: center;
+        width: 100%;
     }
 
 #map {
@@ -78,10 +78,10 @@ html, body, main {
     }
 
 .panel-container-main {
-    width: 100%;
     display: flex;
     flex-flow: row wrap;
     justify-content: center; /* centers all content (widgets) */
+    width: 100%;
 }
     /* Location Panels */
     .panel-container {
