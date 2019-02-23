@@ -13,65 +13,75 @@
                 <div class="container-main">
                     <h1>God's Measuring Stick</h1>
 
-                    <div class="panel-container-main">
-                    <!-- Locataion Detail Panels -->
-                    <div class="panel-container">
-                        <div class = "panel clouds">
-                            <i class = "panel-icon wi wi-cloud"></i>
-                            <div>Clouds</div>
-                            <div class="panel-info">
-                                <div id="panel-clouds">80%</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel-container">
-                        <div class = "panel rain">
-                            <i class = "panel-icon wi wi-umbrella"></i>
-                            <div>Rain</div>
-                            <div class="panel-info">
-                                <div id="panel-rain"></div>
-                            </div>
-                        </div>
-                    </div >
-                    <div class="panel-container">
-                        <div class = "panel snow">
-                            <i class = "panel-icon wi wi-snowflake-cold"></i>
-                            <div>Snow</div>
-                            <div class="panel-info">
-                                <div id="panel-snow"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel-container">
-                        <div class = "panel wind">
-                            <i class = "panel-icon wi wi-strong-wind"></i>
-                            <div>Wind</div>
-                            <div class="panel-info">
-                                <div id="panel-wind-speed"></div>
-                                <div id="panel-wind-dir"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel-container">
-                        <div class = "panel humidity">
-                            <i class = "panel-icon wi wi-humidity"></i>
-                            <div>Humidity</div>
-                            <div class="panel-info">
-                                <div id="panel-humidity"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel-container">
-                        <div class = "panel pressure">
-                            <i class = "panel-icon wi wi-barometer"></i>
-                            <div>Pressure</div>
-                            <div class="panel-info">
-                                <div id="panel-pressure"></div>
-                            </div>
+                    <div class="drop-box-container">
+                        <div id="drop-box">
+                            <div>Drop location<br/>file here...</div>
                         </div>
                     </div>
                     <div class="break"></div>
-                </div></div>
+                    <input id="file-input" type="file" onchange="handleFiles(this.files)">
+                    <div class="break"></div>
+                    
+                    <!-- Location Detail Panels -->
+                    <div class="panel-container-main">
+                        <div class="panel-container">
+                            <div class = "panel clouds">
+                                <i class = "panel-icon wi wi-cloud"></i>
+                                <div>Clouds</div>
+                                <div class="panel-info">
+                                    <div id="panel-clouds">80%</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-container">
+                            <div class = "panel rain">
+                                <i class = "panel-icon wi wi-umbrella"></i>
+                                <div>Rain</div>
+                                <div class="panel-info">
+                                    <div id="panel-rain"></div>
+                                </div>
+                            </div>
+                        </div >
+                        <div class="panel-container">
+                            <div class = "panel snow">
+                                <i class = "panel-icon wi wi-snowflake-cold"></i>
+                                <div>Snow</div>
+                                <div class="panel-info">
+                                    <div id="panel-snow"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-container">
+                            <div class = "panel wind">
+                                <i class = "panel-icon wi wi-strong-wind"></i>
+                                <div>Wind</div>
+                                <div class="panel-info">
+                                    <div id="panel-wind-speed"></div>
+                                    <div id="panel-wind-dir"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-container">
+                            <div class = "panel humidity">
+                                <i class = "panel-icon wi wi-humidity"></i>
+                                <div>Humidity</div>
+                                <div class="panel-info">
+                                    <div id="panel-humidity"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-container">
+                            <div class = "panel pressure">
+                                <i class = "panel-icon wi wi-barometer"></i>
+                                <div>Pressure</div>
+                                <div class="panel-info">
+                                    <div id="panel-pressure"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="break"></div>
+                    </div>
+                </div>
             </div>
         </main>
         <!-- Footer -->

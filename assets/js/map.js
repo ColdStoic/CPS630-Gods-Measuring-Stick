@@ -1,9 +1,9 @@
-// Global Variables.
+// Global Variables
 var jsonForecast = null;
 var jsonWeather = null;
 var results=document.getElementById("myGeolocation"), posOptions={ enableHighAccuracy: false, timeout: 5000, maximumAge: 0};
 
-// Onload.
+// Onload
 document.addEventListener("DOMContentLoaded", function(event) {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition( geolocationSuccess, geolocationFailure, posOptions);
@@ -12,8 +12,39 @@ document.addEventListener("DOMContentLoaded", function(event) {
         //results.innerHTML = "This browser doesn't support geolocation.";
     }
 
+    // Drag and Drop Box
+    dropBox = document.getElementById("drop-box");
+    dropBox.ondragenter = ignoreDrag;
+    dropBox.ondragover = ignoreDrag;
+    dropBox.ondrop = drop;
+
     callAPIs();
 });
+
+// Drag and Drop Functions
+function ignoreDrag(e) {
+    e.stopPropagation();
+    e.preventDefault();
+}
+function drop(e) {
+    e.stopPropagation(); // Cancel this event for everyone else.
+    e.preventDefault();
+    var data = e.dataTransfer; // Get the dragged-in files.
+    var files = data.files;
+    handleFiles(files); // Pass them to the file-processing function.
+}
+function handleFiles(files) {
+    var file = files[0];
+    var reader = new FileReader();
+    reader.onload = function (e) {
+        // When this event fires, the data is ready.
+        // Copy it to a <div> on the page.
+        // var output = document.getElementById("fileOutput");
+        // output.textContent = e.target.result;
+        console.log(e.target.result);
+    };
+    reader.readAsText(file);
+}
 
 function callAPIs() {
 /*     var xmlhttp1 = new XMLHttpRequest();
@@ -56,7 +87,7 @@ function geolocationSuccess(position) {
     var lat = position.coords.latitude,
     lng = position.coords.longitude,
     acc = position.coords.accuracy;
-    
+
     console.log("lat:" + lat);
     console.log("long: " + lng);
 }

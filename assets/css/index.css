@@ -45,6 +45,30 @@ html, body, main {
     justify-content: center; /* centers all content (widgets) */
 }
 
+.drop-box-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+    #drop-box {
+        border: 5px solid black;
+        border-radius: 5px;
+        border-style: dashed;
+        box-shadow: 1px 1px 50px 1px #e7e7e7;
+        width: 200px;
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    #file-input {
+        width: 100%;
+        text-align: center;
+        position: relative;
+        left: 15px;
+    }
+
 .panel-container-main {
     width: 100%;
     display: flex;
