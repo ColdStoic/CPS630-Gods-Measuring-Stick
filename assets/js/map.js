@@ -1,8 +1,8 @@
 // Global Variables
 var jsonCurr = null;
-var jsonDest = null;
+var jsonFile = null;
 var positionCurr = new Array(2);
-var positionDest = null;
+var positionFile = null;
 var posOptions = {enableHighAccuracy: false, timeout: 5000, maximumAge: 0};
 
 // API token goes here
@@ -21,13 +21,24 @@ var map = L.map('map', {
 
 // Marker
 var markerCurr = L.marker([39.73, -104.99]).addTo(map);
-var markerDest = L.marker([39.73, -104.99]).addTo(map);
+var markerFile = L.marker([39.73, -104.99]).addTo(map);
 
 // Add the 'scale' control
 L.control.scale().addTo(map);
 
 // Add the 'layers' control
 L.control.layers({"Streets": streets}).addTo(map);
+
+function onMapClick(e) {
+    positionCurr[0] = e.latlng.lat;
+    positionCurr[1] = e.latlng.lng;
+
+    callAPI("curr");
+    setMap();
+    haversineFormula();
+}
+
+map.on('click', onMapClick);
 
 // Onload
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -56,10 +67,10 @@ function callAPI(mode) {
                 setLocationPanels();
                 console.log(jsonCurr);
             }
-            if (mode == "dest") {
-                jsonDest = JSON.parse(xmlhttp.responseText);
+            if (mode == "file") {
+                jsonFile = JSON.parse(xmlhttp.responseText);
                 setLocationPanels();
-                console.log(jsonDest);
+                console.log(jsonFile);
             }
         }
     }
@@ -68,8 +79,8 @@ function callAPI(mode) {
     if (mode == "curr") {
         jsonURL = "https://us1.locationiq.com/v1/reverse.php?key=" + key + "&lat=" + positionCurr[0] + "&lon=" + positionCurr[1] + "&format=json";
     }
-    if (mode == "dest") {
-        jsonURL = "https://us1.locationiq.com/v1/reverse.php?key=" + key + "&lat=" + positionDest[0] + "&lon=" + positionDest[1] + "&format=json";
+    if (mode == "file") {
+        jsonURL = "https://us1.locationiq.com/v1/reverse.php?key=" + key + "&lat=" + positionFile[0] + "&lon=" + positionFile[1] + "&format=json";
     }
     console.log(jsonURL);
     xmlhttp.open("GET", jsonURL, true);
@@ -92,11 +103,11 @@ function handleFiles(files) {
     var file = files[0];
     var reader = new FileReader();
     reader.onload = function (e) {
-        positionDest = e.target.result.split(", ");
-        callAPI("dest");
+        positionFile = e.target.result.split(", ");
+        callAPI("file");
         setMap();
         haversineFormula();
-        console.log(positionDest[0] + ", " + positionDest[1]);
+        console.log(positionFile[0] + ", " + positionFile[1]);
     };
     reader.readAsText(file);
 }
@@ -117,11 +128,11 @@ function setMap() {
     // Moves marker.
     markerCurr.setLatLng([positionCurr[0], positionCurr[1]]);
 
-    if (positionDest != null) {
-        markerDest.setLatLng([positionDest[0], positionDest[1]]);
+    if (positionFile != null) {
+        markerFile.setLatLng([positionFile[0], positionFile[1]]);
         map.fitBounds([
             [positionCurr[0], positionCurr[1]],
-            [positionDest[0], positionDest[1]]
+            [positionFile[0], positionFile[1]]
         ]);
     }
 }
@@ -135,19 +146,20 @@ function setLocationPanels() {
     document.getElementById("panel-state1").innerHTML = jsonCurr.address.state;
     document.getElementById("panel-country1").innerHTML = jsonCurr.address.country;
 
-    if (jsonDest != null) {
-        document.getElementById("panel-lat2").innerHTML = jsonDest.lat;
-        document.getElementById("panel-lon2").innerHTML = jsonDest.lon;
-        document.getElementById("panel-name2").innerHTML = jsonDest.address.name;
-        document.getElementById("panel-city2").innerHTML = jsonDest.address.city;
-        document.getElementById("panel-state2").innerHTML = jsonDest.address.state;
-        document.getElementById("panel-country2").innerHTML = jsonDest.address.country;
+    if (jsonFile != null) {
+        document.getElementById("panel-lat2").innerHTML = jsonFile.lat;
+        document.getElementById("panel-lon2").innerHTML = jsonFile.lon;
+        document.getElementById("panel-name2").innerHTML = jsonFile.address.name;
+        document.getElementById("panel-city2").innerHTML = jsonFile.address.city;
+        document.getElementById("panel-state2").innerHTML = jsonFile.address.state;
+        document.getElementById("panel-country2").innerHTML = jsonFile.address.country;
     }
 }
 
 // Haversine Formula Worker
 function haversineFormula() {
-    function handleWorkerError(event) {
+    if(positionFile != null) {
+        function handleWorkerError(event) {
         console.warn('Error in web worker: ', event.message);
     }
     function handleWorkerMessage(event) {
@@ -161,5 +173,6 @@ function haversineFormula() {
     myNewWorker.addEventListener('error', handleWorkerError);
     myNewWorker.addEventListener('message', handleWorkerMessage);
 
-    myNewWorker.postMessage([positionCurr[0], positionCurr[1], positionDest[0], positionDest[1]]);
+    myNewWorker.postMessage([positionCurr[0], positionCurr[1], positionFile[0], positionFile[1]]);
+    }
 }
