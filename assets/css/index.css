@@ -123,22 +123,22 @@ html, body, main {
         width: 100%;
     }
     /* Material Colours */
-    .panel.clouds {
-        background-color: #B3E5FC;
-    }
-    .panel.rain{
-        background-color: #2196F3;
-    }
-    .panel.snow{
+    .panel.lat {
         background-color: #84FFFF;
     }
-    .panel.wind {
+    .panel.lon {
+        background-color: #2196F3;
+    }
+    .panel.name {
+        background-color: #B3E5FC;
+    }
+    .panel.city {
         background-color: #9C27B0;
     }
-    .panel.humidity {
+    .panel.state {
         background-color: #4CAF50;
     }
-    .panel.pressure {
+    .panel.country {
         background-color: #F44336;
     }
 

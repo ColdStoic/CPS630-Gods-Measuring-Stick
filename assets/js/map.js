@@ -54,6 +54,7 @@ function callAPI(mode) {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             if (mode == "curr") {
                 jsonCurr = JSON.parse(xmlhttp.responseText);
+                setLocationPanels();
                 console.log(jsonCurr);
             }
             if (mode == "dest") {
@@ -164,12 +165,11 @@ function haversineFormula() {
 } */
 
 
-/* function setWeatherPanels(day) {
-    if (day == 0) {
-        document.getElementById("panel-clouds").innerHTML = jsonWeather.clouds.all + "%";
-        document.getElementById("panel-wind-speed").innerHTML = Math.round(jsonWeather.wind.speed) + "m/s";
-        document.getElementById("panel-wind-dir").innerHTML = Math.round(jsonWeather.wind.deg) + "°";
-        document.getElementById("panel-pressure").innerHTML = Math.round(jsonWeather.main.pressure) + "hPa";
-        document.getElementById("panel-humidity").innerHTML = jsonWeather.main.humidity + "%";
-    }
-} */
+function setLocationPanels() {
+    document.getElementById("panel-lat").innerHTML = jsonCurr.lat;
+    document.getElementById("panel-lon").innerHTML = jsonCurr.lon;
+    document.getElementById("panel-name").innerHTML = jsonCurr.address.name;
+    document.getElementById("panel-city").innerHTML = jsonCurr.address.city;
+    document.getElementById("panel-state").innerHTML = jsonCurr.address.state;
+    document.getElementById("panel-country").innerHTML = jsonCurr.address.country;
+}
