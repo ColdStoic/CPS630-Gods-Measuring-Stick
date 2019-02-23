@@ -5,6 +5,7 @@
         <title>CPS630 - Lab 3</title>
         <link href="assets/css/index.css" rel="stylesheet" type="text/css">
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css">
     </head>
 
     <body>
@@ -20,8 +21,11 @@
                     </div>
                     <div class="break"></div>
                     <input id="file-input" type="file" onchange="handleFiles(this.files)">
-                    <div class="break"></div>
                     
+                    <div class="break"></div>
+                    <div id='map'></div>
+                    <div class="break"></div>
+
                     <!-- Location Detail Panels -->
                     <div class="panel-container-main">
                         <div class="panel-container">
@@ -83,14 +87,40 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <h3>Lab 3</h3>
+                <h3>Student Name: Peter Nguyen</h3>
+                <h3>Student Number: 500582630</h3>
+            </div>
         </main>
-        <!-- Footer -->
-        <div class="footer">
-            <h3>Lab 3</h3>
-            <h3>Student Name: Peter Nguyen</h3>
-            <h3>Student Number: 500582630</h3>
-        </div>
 
         <script type="text/javascript" src="assets/js/map.js"></script>
+        <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+        <script src="https://tiles.unwiredmaps.com/js/leaflet-unwired.js"></script>
+        <script type="text/javascript">
+            // API token goes here
+            var key = '0f5ed629c92c2c';
+
+            // Add layers that we need to the map
+            var streets = L.tileLayer.Unwired({key: key, scheme: "streets"});
+
+            // Initialize the map
+            var map = L.map('map', {
+                center: [39.73, -104.99], // Map loads with this location as center
+                zoom: 14,
+                scrollWheelZoom: false,
+                layers: [streets] // Show 'streets' by default
+            });
+
+            // Add the 'scale' control
+            L.control.scale().addTo(map);
+
+            // Add the 'layers' control
+            L.control.layers({
+                "Streets": streets
+            }).addTo(map);
+        </script>
     </body>
 </html>

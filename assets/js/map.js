@@ -1,7 +1,7 @@
 // Global Variables
 var jsonForecast = null;
 var jsonWeather = null;
-var results=document.getElementById("myGeolocation"), posOptions={ enableHighAccuracy: false, timeout: 5000, maximumAge: 0};
+var results = document.getElementById("myGeolocation"), posOptions={ enableHighAccuracy: false, timeout: 5000, maximumAge: 0};
 
 // Onload
 document.addEventListener("DOMContentLoaded", function(event) {
