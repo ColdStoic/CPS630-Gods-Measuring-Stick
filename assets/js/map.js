@@ -1,7 +1,8 @@
 // Global Variables
 var jsonForecast = null;
 var jsonWeather = null;
-var positionCurr = null;
+var positionCurr = new Array(2);
+var positionDest = null;
 var posOptions = {enableHighAccuracy: false, timeout: 5000, maximumAge: 0};
 
 // API token goes here
@@ -63,10 +64,77 @@ function handleFiles(files) {
     var reader = new FileReader();
     reader.onload = function (e) {
         positionDest = e.target.result.split(", ");
+        setMap();
+        haversineFormula();
         console.log(positionDest[0] + ", " + positionDest[1]);
     };
     reader.readAsText(file);
 }
+
+/* Updates when api responses are recieved. */
+function onCallsReady() {
+}
+
+function geolocationSuccess(position) {
+    positionCurr[0] = position.coords.latitude;
+    positionCurr[1] = position.coords.longitude;
+    setMap();
+}
+function geolocationFailure(error) {
+    console.log("FAILED");
+}
+
+function setMap() {
+    // Moves map.
+    map.setView([positionCurr[0], positionCurr[1]], 13);
+    // Moves marker.
+    markerCurr.setLatLng([positionCurr[0], positionCurr[1]]);
+
+    if (positionDest != null) {
+        markerDest.setLatLng([positionDest[0], positionDest[1]]);
+        map.fitBounds([
+            [positionCurr[0], positionCurr[1]],
+            [positionDest[0], positionDest[1]]
+        ]);
+    }
+}
+
+// Haversine Formula Worker
+function haversineFormula() {
+    function handleWorkerError(event) {
+        console.warn('Error in web worker: ', event.message);
+    }
+    function handleWorkerMessage(event) {
+        console.log('Message received from worker: ' + event.data);
+    }
+
+    // Create a new worker.
+    var myNewWorker = new Worker('assets/js/wworker.js');
+
+    // Register error and message event handlers on the worker.
+    myNewWorker.addEventListener('error', handleWorkerError);
+    myNewWorker.addEventListener('message', handleWorkerMessage);
+
+    myNewWorker.postMessage([positionCurr[0], positionCurr[1], positionDest[0], positionDest[1]]);
+}
+
+
+// Upper First.
+// Capitalizes the first letters of each word in a string.
+/* function toUpperFirst(str) {
+    return str.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+} */
+
+
+/* function setWeatherPanels(day) {
+    if (day == 0) {
+        document.getElementById("panel-clouds").innerHTML = jsonWeather.clouds.all + "%";
+        document.getElementById("panel-wind-speed").innerHTML = Math.round(jsonWeather.wind.speed) + "m/s";
+        document.getElementById("panel-wind-dir").innerHTML = Math.round(jsonWeather.wind.deg) + "°";
+        document.getElementById("panel-pressure").innerHTML = Math.round(jsonWeather.main.pressure) + "hPa";
+        document.getElementById("panel-humidity").innerHTML = jsonWeather.main.humidity + "%";
+    }
+} */
 
 function callAPIs() {
 /*     var xmlhttp1 = new XMLHttpRequest();
@@ -100,69 +168,3 @@ function callAPIs() {
     xmlhttp2.open("GET", jsonURL, true);
     xmlhttp2.send(); */
 }
-
-/* Updates when api responses are recieved. */
-function onCallsReady() {
-}
-
-function geolocationSuccess(position) {
-    var lat = position.coords.latitude,
-    lng = position.coords.longitude,
-    acc = position.coords.accuracy;
-
-    positionCurr = position;
-    setMap(positionCurr);
-    haversineFormula();
-}
-function geolocationFailure(error) {
-    console.log("FAILED");
-}
-
-function setMap(position) {
-    // Moves map
-    map.setView([position.coords.latitude, position.coords.longitude], 13);
-    markerCurr.setLatLng([position.coords.latitude, position.coords.longitude]);
-    markerDest.setLatLng([position.coords.latitude+0.4, position.coords.longitude-0.4]);
-
-    map.fitBounds([
-    [position.coords.latitude, position.coords.longitude],
-    [position.coords.latitude+0.4, position.coords.longitude-0.4]
-]);
-}
-
-// Haversine Formula Worker
-function haversineFormula() {
-    function handleWorkerError(event) {
-        console.warn('Error in web worker: ', event.message);
-    }
-    function handleWorkerMessage(event) {
-        console.log('Message received from worker: ' + event.data);
-    }
-
-    // Create a new worker.
-    var myNewWorker = new Worker('assets/js/wworker.js');
-
-    // Register error and message event handlers on the worker.
-    myNewWorker.addEventListener('error', handleWorkerError);
-    myNewWorker.addEventListener('message', handleWorkerMessage);
-
-    myNewWorker.postMessage([positionCurr.coords.latitude, positionCurr.coords.longitude, positionCurr.coords.latitude+0.4, positionCurr.coords.longitude-0.4]);
-}
-
-
-// Upper First.
-// Capitalizes the first letters of each word in a string.
-/* function toUpperFirst(str) {
-    return str.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
-} */
-
-
-/* function setWeatherPanels(day) {
-    if (day == 0) {
-        document.getElementById("panel-clouds").innerHTML = jsonWeather.clouds.all + "%";
-        document.getElementById("panel-wind-speed").innerHTML = Math.round(jsonWeather.wind.speed) + "m/s";
-        document.getElementById("panel-wind-dir").innerHTML = Math.round(jsonWeather.wind.deg) + "°";
-        document.getElementById("panel-pressure").innerHTML = Math.round(jsonWeather.main.pressure) + "hPa";
-        document.getElementById("panel-humidity").innerHTML = jsonWeather.main.humidity + "%";
-    }
-} */
