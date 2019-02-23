@@ -141,7 +141,11 @@ function setMap() {
 function setLocationPanels() {
     document.getElementById("panel-lat1").innerHTML = jsonCurr.lat;
     document.getElementById("panel-lon1").innerHTML = jsonCurr.lon;
-    document.getElementById("panel-name1").innerHTML = jsonCurr.address.name;
+    if (jsonCurr.address.hasOwnProperty('name')) {
+        document.getElementById("panel-name1").innerHTML = jsonCurr.address.name;
+    } else {
+        document.getElementById("panel-name1").innerHTML = jsonCurr.address.road;
+    }
     document.getElementById("panel-city1").innerHTML = jsonCurr.address.city;
     document.getElementById("panel-state1").innerHTML = jsonCurr.address.state;
     document.getElementById("panel-country1").innerHTML = jsonCurr.address.country;
@@ -149,7 +153,11 @@ function setLocationPanels() {
     if (jsonFile != null) {
         document.getElementById("panel-lat2").innerHTML = jsonFile.lat;
         document.getElementById("panel-lon2").innerHTML = jsonFile.lon;
-        document.getElementById("panel-name2").innerHTML = jsonFile.address.name;
+        if (jsonFile.address.hasOwnProperty('name')) {
+            document.getElementById("panel-name2").innerHTML = jsonFile.address.name;
+        } else {
+            document.getElementById("panel-name2").innerHTML = jsonFile.address.road;
+        }
         document.getElementById("panel-city2").innerHTML = jsonFile.address.city;
         document.getElementById("panel-state2").innerHTML = jsonFile.address.state;
         document.getElementById("panel-country2").innerHTML = jsonFile.address.country;
