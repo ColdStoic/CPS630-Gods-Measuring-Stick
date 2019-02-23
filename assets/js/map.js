@@ -1,6 +1,6 @@
 // Global Variables
-var jsonForecast = null;
-var jsonWeather = null;
+var jsonCurr = null;
+var jsonDest = null;
 var positionCurr = new Array(2);
 var positionDest = null;
 var posOptions = {enableHighAccuracy: false, timeout: 5000, maximumAge: 0};
@@ -43,9 +43,49 @@ document.addEventListener("DOMContentLoaded", function(event) {
     dropBox.ondragenter = ignoreDrag;
     dropBox.ondragover = ignoreDrag;
     dropBox.ondrop = drop;
-
-    callAPIs();
 });
+function callAPI(mode) {
+    var xmlhttp = new XMLHttpRequest();
+    var xmlhttp2 = new XMLHttpRequest();
+    var jsonURL = "";
+
+    // fires when response is recieved.
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            if (mode == "curr") {
+                jsonCurr = JSON.parse(xmlhttp.responseText);
+                console.log(jsonCurr);
+            }
+            if (mode == "dest") {
+                jsonDest = JSON.parse(xmlhttp.responseText);
+                console.log(jsonDest);
+            }
+        }
+    }
+    /* xmlhttp2.onreadystatechange = function() {
+        if (xmlhttp2.readyState == 4 && xmlhttp2.status == 200) {
+            jsonDest = JSON.parse(xmlhttp2.responseText);
+            if (jsonWeather != null) {
+                onCallsReady();
+            }
+        }  
+    } */
+
+    // Send API calls.
+    if (mode == "curr") {
+        jsonURL = "https://us1.locationiq.com/v1/reverse.php?key=" + key + "&lat=" + positionCurr[0] + "&lon=" + positionCurr[1] + "&format=json";
+    }
+    if (mode == "dest") {
+        jsonURL = "https://us1.locationiq.com/v1/reverse.php?key=" + key + "&lat=" + positionDest[0] + "&lon=" + positionDest[1] + "&format=json";
+    }
+    console.log(jsonURL);
+    xmlhttp.open("GET", jsonURL, true);
+    xmlhttp.send();
+
+    /* jsonURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + "&units=" + "&APPID=4c06bfe661f0b300a0f60bc62534ad7d" + "&format=json";
+    xmlhttp2.open("GET", jsonURL, true);
+    xmlhttp2.send(); */
+}
 
 // Drag and Drop Functions
 function ignoreDrag(e) {
@@ -64,6 +104,7 @@ function handleFiles(files) {
     var reader = new FileReader();
     reader.onload = function (e) {
         positionDest = e.target.result.split(", ");
+        callAPI("dest");
         setMap();
         haversineFormula();
         console.log(positionDest[0] + ", " + positionDest[1]);
@@ -71,13 +112,10 @@ function handleFiles(files) {
     reader.readAsText(file);
 }
 
-/* Updates when api responses are recieved. */
-function onCallsReady() {
-}
-
 function geolocationSuccess(position) {
     positionCurr[0] = position.coords.latitude;
     positionCurr[1] = position.coords.longitude;
+    callAPI("curr");
     setMap();
 }
 function geolocationFailure(error) {
@@ -135,36 +173,3 @@ function haversineFormula() {
         document.getElementById("panel-humidity").innerHTML = jsonWeather.main.humidity + "%";
     }
 } */
-
-function callAPIs() {
-/*     var xmlhttp1 = new XMLHttpRequest();
-    var xmlhttp2 = new XMLHttpRequest();
-    var jsonURL = ""; */
-
-    /* // fires when response is recieved.
-    xmlhttp1.onreadystatechange = function() {
-        if (xmlhttp1.readyState == 4 && xmlhttp1.status == 200) {
-            jsonWeather = JSON.parse(xmlhttp1.responseText);
-            if (jsonForecast != null) {
-                onCallsReady();
-            }
-        }
-    }
-    xmlhttp2.onreadystatechange = function() {
-        if (xmlhttp2.readyState == 4 && xmlhttp2.status == 200) {
-            jsonForecast = JSON.parse(xmlhttp2.responseText);
-            if (jsonWeather != null) {
-                onCallsReady();
-            }
-        }  
-    } */
-
-    /* // Send API calls.
-    jsonURL = "https://api.openweathermap.org/data/2.5/weather?q=" + "&units=" + "&APPID=4c06bfe661f0b300a0f60bc62534ad7d";
-    xmlhttp1.open("GET", jsonURL, true);
-    xmlhttp1.send();
-
-    jsonURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + "&units=" + "&APPID=4c06bfe661f0b300a0f60bc62534ad7d";
-    xmlhttp2.open("GET", jsonURL, true);
-    xmlhttp2.send(); */
-}
