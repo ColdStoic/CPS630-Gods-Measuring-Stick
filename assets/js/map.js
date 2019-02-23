@@ -1,11 +1,7 @@
 // Global Variables
-var jsonCurr = null;
-var jsonFile = null;
-var positionCurr = new Array(2);
-var positionFile = null;
+var jsonResults = [];
+var positions = [];
 var posOptions = { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 };
-var latlngs = [[0, 0], [0, 0]];
-var distance = 0;
 
 // Map
 // API token goes here
@@ -21,13 +17,10 @@ var map = L.map('map', {
     scrollWheelZoom: false,
     layers: [streets] // Show 'streets' by default
 });
-
 // Marker
 var markerCurr = L.marker([0, 0]).addTo(map);
-var markerFile = L.marker([0, 0]).addTo(map);
-
-// Path Polyline
-var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
+// Polylines
+var polylines = [];
 
 // Add the 'scale' control
 L.control.scale().addTo(map);
@@ -37,9 +30,11 @@ L.control.layers({"Streets": streets}).addTo(map);
 
 // Map On-Click Handler
 function onMapClick(e) {
-    positionCurr[0] = e.latlng.lat;
-    positionCurr[1] = e.latlng.lng;
-    callAPI("curr");
+    var latlon = [e.latlng.lat, e.latlng.lng];
+    positions[0] = latlon;
+    markerCurr.setLatLng(latlon); // Moves marker.
+    setLines();
+    callAPI(latlon, "update");
 }
 map.on('click', onMapClick);
 
@@ -57,41 +52,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
     dropBox.ondragenter = ignoreDrag;
     dropBox.ondragover = ignoreDrag;
     dropBox.ondrop = drop;
-
-    document.getElementById("panel-curr").style.display = "none";
-    document.getElementById("panel-file").style.display = "none";
 });
 // API Call Handler
-function callAPI(mode) {
+function callAPI(latlng, mode) {
     var xmlhttp = new XMLHttpRequest();
     var jsonURL = "";
 
     // fires when response is recieved.
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            if (mode == "curr") {
-                jsonCurr = JSON.parse(xmlhttp.responseText);
-                document.getElementById("panel-curr").style.display = "contents";
-                // console.log(jsonCurr);
+            if (mode == "update") {
+                jsonResults[0] = JSON.parse(xmlhttp.responseText);
+                setLocationPanels("update");
             }
-            if (mode == "file") {
-                jsonFile = JSON.parse(xmlhttp.responseText);
-                document.getElementById("panel-file").style.display = "contents";
-                // console.log(jsonFile);
+            if (mode == "push") {
+                jsonResults.push(JSON.parse(xmlhttp.responseText));
+                setLocationPanels("push");
             }
-            haversineFormula();
-            setLocationPanels();
-            setMap();
         }
     }
 
     // Send API calls.
-    if (mode == "curr") {
-        jsonURL = "https://us1.locationiq.com/v1/reverse.php?key=" + key + "&lat=" + positionCurr[0] + "&lon=" + positionCurr[1] + "&format=json";
-    }
-    if (mode == "file") {
-        jsonURL = "https://us1.locationiq.com/v1/reverse.php?key=" + key + "&lat=" + positionFile[0] + "&lon=" + positionFile[1] + "&format=json";
-    }
+    jsonURL = "https://us1.locationiq.com/v1/reverse.php?key=" + key + "&lat=" + latlng[0] + "&lon=" + latlng[1] + "&format=json";
     xmlhttp.open("GET", jsonURL, true);
     xmlhttp.send();
 }
@@ -112,94 +94,97 @@ function handleFiles(files) {
     var file = files[0];
     var reader = new FileReader();
     reader.onload = function (e) {
-        positionFile = e.target.result.split(", ");
-        callAPI("file");
+        var positionString = e.target.result.split("\n");
+        for (i = 0; i < positionString.length; i++) {
+            // Parse and push location coodinates.
+            var positionArray = positionString[i].split(", ");
+            positionArray[0] = Number(positionArray[0]);
+            positionArray[1] = Number(positionArray[1]);
+            positions.push(positionArray);
+            
+            map.fitBounds(positions); // Reposition map.
+            L.marker([positions[i + 1][0], positions[i + 1][1]]).addTo(map); // Add markers.
+            pushTemplate((i + 2)); // Push location detail template.
+
+            var delayInMilliseconds = 1000; //1 second
+            setTimeout(function(j) {
+                callAPI([positions[j + 1][0], positions[j + 1][1]], "push"); // Call API.
+            }, delayInMilliseconds*i, i);
+        }
+        setLines(); // Set lines/
     };
     reader.readAsText(file);
 }
 
 // GeoLocation Handlers
 function geolocationSuccess(position) {
-    positionCurr[0] = position.coords.latitude;
-    positionCurr[1] = position.coords.longitude;
-
-    // Moves map.
-    map.setView([positionCurr[0], positionCurr[1]], 13);
-    callAPI("curr");
+    positions.push([position.coords.latitude, position.coords.longitude]);
+    map.setView([positions[0][0], positions[0][1]], 13); // Moves map.
+    markerCurr.setLatLng([positions[0][0], positions[0][1]]); // Creates marker.
+    pushTemplate(1); // Push location detail template.
+    callAPI(positions[0], "push"); // Call api.
 }
 function geolocationFailure(error) {
     console.log("This browser doesn't support geolocation.");
 }
 
-// Set Map
-function setMap() {
-    // Moves marker.
-    markerCurr.setLatLng([positionCurr[0], positionCurr[1]]);
-
-    if (positionFile != null) {
-        latlngs = [
-            [positionCurr[0], positionCurr[1]],
-            [positionFile[0], positionFile[1]]
-        ];
-        markerFile.setLatLng([positionFile[0], positionFile[1]]);
-        map.fitBounds(latlngs);
+// Set Location Panel Details
+function setLocationPanels(mode) {
+    var i = 0;
+    if (mode == "push") {
+        i = (jsonResults.length - 1);
     }
+    
+    document.getElementsByClassName("panel-lat")[i].innerHTML = jsonResults[i].lat;
+    document.getElementsByClassName("panel-lon")[i].innerHTML = jsonResults[i].lon;
+    if (jsonResults[i].address.hasOwnProperty('name')) {
+        document.getElementsByClassName("panel-name")[i].innerHTML = jsonResults[i].address.name;
+    } else {
+        document.getElementsByClassName("panel-name")[i].innerHTML = jsonResults[i].address.road;
+    }
+    document.getElementsByClassName("panel-city")[i].innerHTML = jsonResults[i].address.city;
+    document.getElementsByClassName("panel-state")[i].innerHTML = jsonResults[i].address.state;
+    document.getElementsByClassName("panel-country")[i].innerHTML = jsonResults[i].address.country;
 }
 
-// Set Location Panel Details
-function setLocationPanels() {
-    document.getElementById("panel-lat1").innerHTML = jsonCurr.lat;
-    document.getElementById("panel-lon1").innerHTML = jsonCurr.lon;
-    if (jsonCurr.address.hasOwnProperty('name')) {
-        document.getElementById("panel-name1").innerHTML = jsonCurr.address.name;
-    } else {
-        document.getElementById("panel-name1").innerHTML = jsonCurr.address.road;
+// Set Lines and Distance
+function setLines() {
+    // Clear all lines.
+    for(i = 0; i < polylines.length; i++) {
+        map.removeLayer(polylines[i]);
     }
-    document.getElementById("panel-city1").innerHTML = jsonCurr.address.city;
-    document.getElementById("panel-state1").innerHTML = jsonCurr.address.state;
-    document.getElementById("panel-country1").innerHTML = jsonCurr.address.country;
+    polylines = [];
 
-    if (jsonFile != null) {
-        document.getElementById("panel-lat2").innerHTML = jsonFile.lat;
-        document.getElementById("panel-lon2").innerHTML = jsonFile.lon;
-        if (jsonFile.address.hasOwnProperty('name')) {
-            document.getElementById("panel-name2").innerHTML = jsonFile.address.name;
-        } else {
-            document.getElementById("panel-name2").innerHTML = jsonFile.address.road;
-        }
-        document.getElementById("panel-city2").innerHTML = jsonFile.address.city;
-        document.getElementById("panel-state2").innerHTML = jsonFile.address.state;
-        document.getElementById("panel-country2").innerHTML = jsonFile.address.country;
+    // Create new lines.
+    for(i = 1; i < positions.length; i++) {
+        polylines.push(L.polyline([positions[0], [positions[i][0], positions[i][1]]], {color: 'blue'}).addTo(map));
+        haversineFormula(i);
     }
 }
 
 // Haversine Formula Worker
-function haversineFormula() {
-    if(positionFile != null) {
-        function handleWorkerError(event) {
-            console.warn('Error in web worker: ', event.message);
-        }
-        function handleWorkerMessage(event) {
-            console.log('Distance: ' + event.data);
-            distance = event.data;
-            polyline.unbindTooltip();
-            polyline.setLatLngs(latlngs);
-            polyline.bindTooltip((Math.round(distance * 10) / 10 ) + "km", {permanent: true, direction:"center", className: "tooltip"});
-
-            myNewWorker.terminate(); // Kill worker when calculation is complete.
-        }
-
-        // Create a new worker.
-        // Workaround to allow local workers on Google Chrome.
-        var blob = new Blob(["onmessage = function(e){" + haversine_formula.toString() + "haversine_formula(e);}"]);
-        var blobURL = window.URL.createObjectURL(blob);
-        var myNewWorker = new Worker(blobURL);
-        // var myNewWorker = new Worker('assets/js/wworker.js');
-
-        // Register error and message event handlers on the worker.
-        myNewWorker.addEventListener('error', handleWorkerError);
-        myNewWorker.addEventListener('message', handleWorkerMessage);
-
-        myNewWorker.postMessage([positionCurr[0], positionCurr[1], positionFile[0], positionFile[1]]);
+function haversineFormula(i) {
+    function handleWorkerError(event) {
+        console.warn('Error in web worker: ', event.message);
     }
+    function handleWorkerMessage(event) {
+        console.log('Distance: ' + event.data[0]);
+        var distance = event.data[0];
+        polylines[event.data[1]].unbindTooltip();
+        polylines[event.data[1]].bindTooltip((Math.round(distance * 10) / 10 ) + "km", {permanent: true, direction:"center", className: "tooltip"});
+        //myNewWorker.terminate(); // Kill worker when calculation is complete.
+    }
+
+    // Create a new worker.
+    // Workaround to allow local workers on Google Chrome.
+    var blob = new Blob(["onmessage = function(e){" + haversine_formula.toString() + "haversine_formula(e);}"]);
+    var blobURL = window.URL.createObjectURL(blob);
+    var myNewWorker = new Worker(blobURL);
+    // var myNewWorker = new Worker('assets/js/wworker.js');
+
+    // Register error and message event handlers on the worker.
+    myNewWorker.addEventListener('error', handleWorkerError);
+    myNewWorker.addEventListener('message', handleWorkerMessage);
+
+    myNewWorker.postMessage([positions[0], [positions[i][0], positions[i][1]], (i - 1)]);
 }

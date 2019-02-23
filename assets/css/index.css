@@ -76,12 +76,15 @@ html, body, main {
         font-size: 30px;
     }
 
-.panel-container-main {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: center; /* centers all content (widgets) */
-    width: 100%;
+#panel-location-info {
+    text-align: center;
 }
+    .panel-container-main {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center; /* centers all content (widgets) */
+        width: 100%;
+    }
     /* Location Panels */
     .panel-container {
         margin: 5px;
@@ -162,7 +165,7 @@ html, body, main {
 
 /* Responsive Scaling */
 /* Small devices (portrait tablets and large phones, 600px and up) */
-@media (max-width: 600px) {
+@media screen and (max-width: 600px) {
     .container-main {
         width: 90%;
     }
@@ -171,7 +174,7 @@ html, body, main {
     }
 }
     /* Small devices (portrait tablets and large phones, 600px and up) */
-    @media (min-width: 600px) {
+    @media screen and (min-width: 600px) {
         .container-main {
             width: 90%;
         }
@@ -181,7 +184,7 @@ html, body, main {
     }
 
     /* Medium devices (landscape tablets, 768px and up) */
-    @media (min-width: 768px) {
+    @media screen and (min-width: 768px) {
         .container-main {
             width: 80%;
         }

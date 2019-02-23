@@ -5,11 +5,11 @@ function haversine_formula(e) {
         return x * Math.PI / 180;
     }
 
-    var lon1 = e.data[0];
-    var lat1 = e.data[1];
+    var lon1 = e.data[0][0];
+    var lat1 = e.data[0][1];
 
-    var lon2 = e.data[2];
-    var lat2 = e.data[3];
+    var lon2 = e.data[1][0];
+    var lat2 = e.data[1][1];
 
     var R = 6371; // km
 
@@ -23,7 +23,7 @@ function haversine_formula(e) {
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     var d = R * c;
 
-    self.postMessage(d);
+    self.postMessage([d, e.data[2]]);
 }
 
 // Workaround to allow local workers on Google Chrome.
