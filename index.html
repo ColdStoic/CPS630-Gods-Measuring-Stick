@@ -96,31 +96,8 @@
             </div>
         </main>
 
-        <script type="text/javascript" src="assets/js/map.js"></script>
         <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
         <script src="https://tiles.unwiredmaps.com/js/leaflet-unwired.js"></script>
-        <script type="text/javascript">
-            // API token goes here
-            var key = '0f5ed629c92c2c';
-
-            // Add layers that we need to the map
-            var streets = L.tileLayer.Unwired({key: key, scheme: "streets"});
-
-            // Initialize the map
-            var map = L.map('map', {
-                center: [39.73, -104.99], // Map loads with this location as center
-                zoom: 14,
-                scrollWheelZoom: false,
-                layers: [streets] // Show 'streets' by default
-            });
-
-            // Add the 'scale' control
-            L.control.scale().addTo(map);
-
-            // Add the 'layers' control
-            L.control.layers({
-                "Streets": streets
-            }).addTo(map);
-        </script>
+        <script type="text/javascript" src="assets/js/map.js"></script>
     </body>
 </html>

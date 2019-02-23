@@ -3,6 +3,31 @@ var jsonForecast = null;
 var jsonWeather = null;
 var results = document.getElementById("myGeolocation"), posOptions={ enableHighAccuracy: false, timeout: 5000, maximumAge: 0};
 
+// API token goes here
+var key = '0f5ed629c92c2c';
+
+// Add layers that we need to the map
+var streets = L.tileLayer.Unwired({key: key, scheme: "streets"});
+
+// Initialize the map
+var map = L.map('map', {
+    center: [39.73, -104.99], // Map loads with this location as center
+    zoom: 14,
+    scrollWheelZoom: false,
+    layers: [streets] // Show 'streets' by default
+});
+
+// Add the 'scale' control
+L.control.scale().addTo(map);
+
+// Add the 'layers' control
+L.control.layers({
+    "Streets": streets
+}).addTo(map);
+
+// Moves map
+map.setView([51.505, -0.09], 13);
+
 // Onload
 document.addEventListener("DOMContentLoaded", function(event) {
     if (navigator.geolocation) {
