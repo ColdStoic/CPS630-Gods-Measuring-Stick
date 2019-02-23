@@ -62,11 +62,8 @@ function handleFiles(files) {
     var file = files[0];
     var reader = new FileReader();
     reader.onload = function (e) {
-        // When this event fires, the data is ready.
-        // Copy it to a <div> on the page.
-        // var output = document.getElementById("fileOutput");
-        // output.textContent = e.target.result;
-        console.log(e.target.result);
+        positionDest = e.target.result.split(", ");
+        console.log(positionDest[0] + ", " + positionDest[1]);
     };
     reader.readAsText(file);
 }
