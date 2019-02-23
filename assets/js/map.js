@@ -1,7 +1,8 @@
 // Global Variables
 var jsonForecast = null;
 var jsonWeather = null;
-var results = document.getElementById("myGeolocation"), posOptions={ enableHighAccuracy: false, timeout: 5000, maximumAge: 0};
+var positionCurr = null;
+var posOptions = {enableHighAccuracy: false, timeout: 5000, maximumAge: 0};
 
 // API token goes here
 var key = '0f5ed629c92c2c';
@@ -18,20 +19,19 @@ var map = L.map('map', {
 });
 
 // Marker
-var marker = L.marker([39.73, -104.99]).addTo(map);
+var markerCurr = L.marker([39.73, -104.99]).addTo(map);
+var markerDest = L.marker([39.73, -104.99]).addTo(map);
 
 // Add the 'scale' control
 L.control.scale().addTo(map);
 
 // Add the 'layers' control
-L.control.layers({
-    "Streets": streets
-}).addTo(map);
+L.control.layers({"Streets": streets}).addTo(map);
 
 // Onload
 document.addEventListener("DOMContentLoaded", function(event) {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition( geolocationSuccess, geolocationFailure, posOptions);
+        navigator.geolocation.getCurrentPosition(geolocationSuccess, geolocationFailure, posOptions);
     }
     else {
         //results.innerHTML = "This browser doesn't support geolocation.";
@@ -113,20 +113,45 @@ function geolocationSuccess(position) {
     lng = position.coords.longitude,
     acc = position.coords.accuracy;
 
-    console.log("lat:" + lat);
-    console.log("long: " + lng);
-
-    setMapPosition(position);
+    positionCurr = position;
+    setMap(positionCurr);
+    haversineFormula();
 }
 function geolocationFailure(error) {
     console.log("FAILED");
 }
 
-function setMapPosition(position) {
+function setMap(position) {
     // Moves map
     map.setView([position.coords.latitude, position.coords.longitude], 13);
-    marker.setLatLng([position.coords.latitude, position.coords.longitude]);
+    markerCurr.setLatLng([position.coords.latitude, position.coords.longitude]);
+    markerDest.setLatLng([position.coords.latitude+0.4, position.coords.longitude-0.4]);
+
+    map.fitBounds([
+    [position.coords.latitude, position.coords.longitude],
+    [position.coords.latitude+0.4, position.coords.longitude-0.4]
+]);
 }
+
+// Haversine Formula Worker
+function haversineFormula() {
+    function handleWorkerError(event) {
+        console.warn('Error in web worker: ', event.message);
+    }
+    function handleWorkerMessage(event) {
+        console.log('Message received from worker: ' + event.data);
+    }
+
+    // Create a new worker.
+    var myNewWorker = new Worker('assets/js/wworker.js');
+
+    // Register error and message event handlers on the worker.
+    myNewWorker.addEventListener('error', handleWorkerError);
+    myNewWorker.addEventListener('message', handleWorkerMessage);
+
+    myNewWorker.postMessage([positionCurr.coords.latitude, positionCurr.coords.longitude, positionCurr.coords.latitude+0.4, positionCurr.coords.longitude-0.4]);
+}
+
 
 // Upper First.
 // Capitalizes the first letters of each word in a string.
