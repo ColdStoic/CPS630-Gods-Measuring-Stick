@@ -25,9 +25,6 @@ L.control.layers({
     "Streets": streets
 }).addTo(map);
 
-// Moves map
-map.setView([51.505, -0.09], 13);
-
 // Onload
 document.addEventListener("DOMContentLoaded", function(event) {
     if (navigator.geolocation) {
@@ -115,9 +112,16 @@ function geolocationSuccess(position) {
 
     console.log("lat:" + lat);
     console.log("long: " + lng);
+
+    setMapPosition(position);
 }
 function geolocationFailure(error) {
     console.log("FAILED");
+}
+
+function setMapPosition(position) {
+    // Moves map
+    map.setView([position.coords.latitude, position.coords.longitude], 13);
 }
 
 // Upper First.
