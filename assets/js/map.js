@@ -46,7 +46,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 function callAPI(mode) {
     var xmlhttp = new XMLHttpRequest();
-    var xmlhttp2 = new XMLHttpRequest();
     var jsonURL = "";
 
     // fires when response is recieved.
@@ -59,18 +58,11 @@ function callAPI(mode) {
             }
             if (mode == "dest") {
                 jsonDest = JSON.parse(xmlhttp.responseText);
+                setLocationPanels();
                 console.log(jsonDest);
             }
         }
     }
-    /* xmlhttp2.onreadystatechange = function() {
-        if (xmlhttp2.readyState == 4 && xmlhttp2.status == 200) {
-            jsonDest = JSON.parse(xmlhttp2.responseText);
-            if (jsonWeather != null) {
-                onCallsReady();
-            }
-        }  
-    } */
 
     // Send API calls.
     if (mode == "curr") {
@@ -82,10 +74,6 @@ function callAPI(mode) {
     console.log(jsonURL);
     xmlhttp.open("GET", jsonURL, true);
     xmlhttp.send();
-
-    /* jsonURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + "&units=" + "&APPID=4c06bfe661f0b300a0f60bc62534ad7d" + "&format=json";
-    xmlhttp2.open("GET", jsonURL, true);
-    xmlhttp2.send(); */
 }
 
 // Drag and Drop Functions
@@ -138,6 +126,25 @@ function setMap() {
     }
 }
 
+// Set Location Panel Details
+function setLocationPanels() {
+    document.getElementById("panel-lat1").innerHTML = jsonCurr.lat;
+    document.getElementById("panel-lon1").innerHTML = jsonCurr.lon;
+    document.getElementById("panel-name1").innerHTML = jsonCurr.address.name;
+    document.getElementById("panel-city1").innerHTML = jsonCurr.address.city;
+    document.getElementById("panel-state1").innerHTML = jsonCurr.address.state;
+    document.getElementById("panel-country1").innerHTML = jsonCurr.address.country;
+
+    if (jsonDest != null) {
+        document.getElementById("panel-lat2").innerHTML = jsonDest.lat;
+        document.getElementById("panel-lon2").innerHTML = jsonDest.lon;
+        document.getElementById("panel-name2").innerHTML = jsonDest.address.name;
+        document.getElementById("panel-city2").innerHTML = jsonDest.address.city;
+        document.getElementById("panel-state2").innerHTML = jsonDest.address.state;
+        document.getElementById("panel-country2").innerHTML = jsonDest.address.country;
+    }
+}
+
 // Haversine Formula Worker
 function haversineFormula() {
     function handleWorkerError(event) {
@@ -155,21 +162,4 @@ function haversineFormula() {
     myNewWorker.addEventListener('message', handleWorkerMessage);
 
     myNewWorker.postMessage([positionCurr[0], positionCurr[1], positionDest[0], positionDest[1]]);
-}
-
-
-// Upper First.
-// Capitalizes the first letters of each word in a string.
-/* function toUpperFirst(str) {
-    return str.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
-} */
-
-
-function setLocationPanels() {
-    document.getElementById("panel-lat").innerHTML = jsonCurr.lat;
-    document.getElementById("panel-lon").innerHTML = jsonCurr.lon;
-    document.getElementById("panel-name").innerHTML = jsonCurr.address.name;
-    document.getElementById("panel-city").innerHTML = jsonCurr.address.city;
-    document.getElementById("panel-state").innerHTML = jsonCurr.address.state;
-    document.getElementById("panel-country").innerHTML = jsonCurr.address.country;
 }
