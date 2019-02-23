@@ -17,6 +17,9 @@ var map = L.map('map', {
     layers: [streets] // Show 'streets' by default
 });
 
+// Marker
+var marker = L.marker([39.73, -104.99]).addTo(map);
+
 // Add the 'scale' control
 L.control.scale().addTo(map);
 
@@ -122,6 +125,7 @@ function geolocationFailure(error) {
 function setMapPosition(position) {
     // Moves map
     map.setView([position.coords.latitude, position.coords.longitude], 13);
+    marker.setLatLng([position.coords.latitude, position.coords.longitude]);
 }
 
 // Upper First.
